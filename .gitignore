@@ -1,0 +1,14 @@
+# VS Code
+.vscode/
+
+# Java
+*.class
+target/
+
+# Environment / secrets
+.env
+.env.*
+
+# OS files
+.DS_Store
+Thumbs.db
