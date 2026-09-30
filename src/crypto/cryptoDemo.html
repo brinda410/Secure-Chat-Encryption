@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AES-GCM Test</title>
+</head>
+
+<body>
+
+    <h1>Secure Chat - AES-GCM Test</h1>
+
+    <button onclick="runTest()">Run Encryption Test</button>
+
+    <h3>Original Message</h3>
+    <p id="original"></p>
+
+    <h3>Encrypted Message</h3>
+    <p id="encrypted"></p>
+
+    <h3>Decrypted Message</h3>
+    <p id="decrypted"></p>
+
+    <script>
+
+        async function runTest() {
+
+            // Our original chat message
+            const message = "Hello Bob!";
+
+            // Generate an AES-256-GCM key
+            const key = await crypto.subtle.generateKey(
+                {
+                    name: "AES-GCM",
+                    length: 256
+                },
+                true,
+                ["encrypt", "decrypt"]
+            );
+
+            // Generate a random IV
+            const iv = crypto.getRandomValues(
+                new Uint8Array(12)
+            );
+
+            // Convert message into bytes
+            const encoder = new TextEncoder();
+            const data = encoder.encode(message);
+
+            // Encrypt the message
+            const encrypted = await crypto.subtle.encrypt(
+                {
+                    name: "AES-GCM",
+                    iv: iv
+                },
+                key,
+                data
+            );
+
+            // Convert encrypted data into readable hexadecimal
+            const encryptedArray = new Uint8Array(encrypted);
+            
+            const encryptedText = Array.from(encryptedArray)
+                .map(byte => byte.toString(16).padStart(2, "0"))
+                .join("");
+
+            // Show original and encrypted message
+            document.getElementById("original").textContent = message;
+            document.getElementById("encrypted").textContent = encryptedText;
+
+            // Decrypt the message
+        try {
+
+    const decrypted = await crypto.subtle.decrypt(
+        {
+            name: "AES-GCM",
+            iv: iv
+        },
+        key,
+        encryptedArray
+    );
+
+    const decoder = new TextDecoder();
+
+    const decryptedMessage = decoder.decode(decrypted);
+
+    document.getElementById("decrypted").textContent =
+        decryptedMessage;
+
+} catch (error) {
+
+    document.getElementById("decrypted").textContent =
+        "❌ Authentication failed — message was tampered with.";
+    }
+}
+    </script>
+
+</body>
+</html>

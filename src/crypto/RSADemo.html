@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>RSA-OAEP Test</title>
+</head>
+
+<body>
+
+    <h1>Secure Chat - RSA-OAEP Test</h1>
+
+    <button onclick="generateRSAKeys()">Generate RSA Keys</button>
+
+    <h3>Status</h3>
+    <p id="status">Waiting...</p>
+
+    <h3>Public Key</h3>
+    <p id="publicKey"></p>
+
+    <h3>Private Key</h3>
+    <p id="privateKey"></p>
+
+    <script>
+
+        async function generateRSAKeys() {
+
+            // Generate RSA public/private key pair
+            const keyPair = await crypto.subtle.generateKey(
+                {
+                    name: "RSA-OAEP",
+                    modulusLength: 2048,
+                    publicExponent: new Uint8Array([1, 0, 1]),
+                    hash: "SHA-256"
+                },
+                true,
+                ["encrypt", "decrypt"]
+            );
+
+            document.getElementById("status").textContent =
+                "✅ RSA-OAEP key pair generated successfully!";
+
+            // Convert public key to readable format
+            const publicKey = await crypto.subtle.exportKey(
+                "spki",
+                keyPair.publicKey
+            );
+
+            const publicKeyArray = new Uint8Array(publicKey);
+
+            const publicKeyText = Array.from(publicKeyArray)
+                .map(byte => byte.toString(16).padStart(2, "0"))
+                .join("");
+
+            document.getElementById("publicKey").textContent =
+                publicKeyText;
+
+            document.getElementById("privateKey").textContent =
+                "🔐 Private key generated and kept locally.";
+        }
+
+    </script>
+
+</body>
+</html>
